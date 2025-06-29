@@ -201,14 +201,6 @@
     return addr.slice(0, 6) + '...' + addr.slice(-6);
   }
 
-  async function connectWallet() {
-    try {
-      await tonConnectUI.connectWallet();
-    } catch (err) {
-      alert("Ошибка подключения кошелька");
-    }
-  }
-
   tonConnectUI.onStatusChange(wallet => {
     if (wallet && wallet.account?.address) {
       connectedWallet = wallet;
@@ -222,7 +214,10 @@
 
   button.addEventListener('click', async () => {
     const amount = parseFloat(amountInput.value);
-    if (!connectedWallet) return connectWallet();
+
+    if (!connectedWallet) {
+      return tonConnectUI.openModal(); // Открыть модал выбора кошелька
+    }
 
     if (isNaN(amount) || amount < 0.5) {
       return alert("Минимальная сумма — 0.5 TON");
@@ -234,8 +229,8 @@
       validUntil: Math.floor(Date.now() / 1000) + 600,
       messages: [
         {
-          address: "UQA3CvDUu1CY........", // Адрес получателя
-          amount: nano,
+          address: "UQA3CvDUu1CY........", // 🔁 ← Заменить на ваш TON адрес
+          amount: nano
         }
       ]
     };
