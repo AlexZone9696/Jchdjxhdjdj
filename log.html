@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Лог транзакций</title>
+  <style>
+    body {
+      background: #12001c;
+      color: #fff;
+      font-family: monospace;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #a35cf5;
+    }
+
+    pre {
+      background: #1e1e2f;
+      padding: 20px;
+      border-radius: 12px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h2>Лог транзакций</h2>
+  <pre>
+<?php
+  $log = @file_get_contents("trans.txt");
+  echo $log ? htmlspecialchars($log) : "Файл trans.txt пока пуст.";
+?>
+  </pre>
+</body>
+</html>
