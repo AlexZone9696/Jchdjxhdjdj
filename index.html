@@ -84,6 +84,22 @@
       margin-bottom: 15px;
     }
 
+    .btn {
+      background: var(--accent);
+      color: var(--text);
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+
     .divider {
       text-align: center;
       margin: 20px 0;
@@ -121,7 +137,7 @@
 <div class="container">
 
   <div class="balance-card">
-    <img src="assets/ton-icon.png" class="token-icon" alt="TON">
+    <img src="https://raw.githubusercontent.com/ton-blockchain/ton-assets/master/ton/icon.png" class="token-icon" alt="TON">
     <div>
       <div class="balance-value">0.4097 TON</div>
       <div class="balance-label">Ваш баланс</div>
@@ -136,7 +152,14 @@
   <div class="form">
     <label for="amount">Сумма пополнения</label>
     <input type="number" id="amount" min="0.5" value="10">
+
     <div id="ton-connect-button"></div>
+
+    <div id="address-box" style="display:none;">
+      <label>Ваш адрес TON</label>
+      <input type="text" id="wallet-address" readonly>
+      <button class="btn" id="send-ton">Пополнить</button>
+    </div>
   </div>
 
   <div class="divider">или</div>
@@ -168,8 +191,46 @@
     buttonRootId: 'ton-connect-button'
   });
 
+  const addressBox = document.getElementById('address-box');
+  const addressInput = document.getElementById('wallet-address');
+  const sendBtn = document.getElementById('send-ton');
+  const amountInput = document.getElementById('amount');
+
   tonConnectUI.onStatusChange(wallet => {
-    console.log("🟢 Подключен кошелёк:", wallet);
+    if (wallet && wallet.account) {
+      addressInput.value = wallet.account.address;
+      addressBox.style.display = 'block';
+    }
+  });
+
+  sendBtn.addEventListener('click', async () => {
+    const amount = parseFloat(amountInput.value);
+    if (isNaN(amount) || amount < 0.5) {
+      alert("Минимальная сумма пополнения — 0.5 TON");
+      return;
+    }
+
+    const nanoAmount = (amount * 1e9).toFixed(0);
+    const destination = "UQC8Z7...x3FhPp"; // адрес для пополнения
+    const payload = null; // можешь вставить base64 payload если нужно
+
+    const tx = {
+      validUntil: Math.floor(Date.now() / 1000) + 600,
+      messages: [
+        {
+          address: destination,
+          amount: nanoAmount,
+          payload: payload
+        }
+      ]
+    };
+
+    try {
+      await tonConnectUI.sendTransaction(tx);
+    } catch (e) {
+      alert("Ошибка при отправке транзакции");
+      console.error(e);
+    }
   });
 </script>
 </body>
