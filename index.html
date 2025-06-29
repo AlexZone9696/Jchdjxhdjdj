@@ -69,12 +69,6 @@
       border-bottom: 2px solid var(--accent);
     }
 
-    .form label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 14px;
-    }
-
     .input-group {
       position: relative;
       margin-bottom: 20px;
@@ -150,6 +144,30 @@
     .hidden {
       display: none;
     }
+
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #28a745;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      font-size: 16px;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    #toast.error {
+      background: #dc3545;
+    }
+
+    #toast.show {
+      opacity: 1;
+    }
   </style>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 </head>
@@ -170,7 +188,6 @@
   </div>
 
   <div class="form">
-
     <div class="input-group">
       <input type="number" id="amount" min="0.5" value="10" placeholder="Сумма (TON)">
     </div>
@@ -200,8 +217,9 @@
       <input readonly value="> 0.5 TON">
     </div>
   </div>
-
 </div>
+
+<div id="toast" class="hidden"></div>
 
 <script>
   const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
@@ -219,7 +237,6 @@
   const amountInput = document.getElementById('amount');
   const disconnectBtn = document.getElementById('disconnect-btn');
 
-  // Преобразование raw-адреса в user-friendly (base64)
   function toUserFriendlyAddress(rawAddress) {
     try {
       const { Address } = TON_CONNECT_UI;
@@ -241,6 +258,17 @@
     button.textContent = 'Подключить';
   }
 
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'show';
+    if (type === 'error') toast.classList.add('error');
+
+    setTimeout(() => {
+      toast.classList.remove('show', 'error');
+    }, 3000);
+  }
+
   tonConnectUI.onStatusChange(wallet => {
     if (wallet && wallet.account?.address) {
       connectedWallet = wallet;
@@ -257,8 +285,8 @@
     const amount = parseFloat(amountInput.value);
     if (!connectedWallet) return tonConnectUI.openModal();
 
-    if (isNaN(amount) || amount < 0.0001) {
-      return alert("Минимальная сумма — 0.0001 TON");
+    if (isNaN(amount) || amount < 0.00001) {
+      return showToast("Минимальная сумма — 0.00001 TON", "error");
     }
 
     const nano = (amount * 1e9).toFixed(0);
@@ -266,7 +294,7 @@
       validUntil: Math.floor(Date.now() / 1000) + 600,
       messages: [
         {
-          address: "UQDvn8O6Jc09WvsZEX9I3j4HynNwu7w6Hog2olS80U5nywB2", // Заменить на ваш адрес
+          address: "UQDvn8O6Jc09WvsZEX9I3j4HynNwu7w6Hog2olS80U5nywB2", // ваш адрес
           amount: nano
         }
       ]
@@ -274,8 +302,9 @@
 
     try {
       await tonConnectUI.sendTransaction(tx);
+      showToast("Транзакция отправлена успешно ✅");
     } catch (e) {
-      alert("Ошибка при отправке TON");
+      showToast("Ошибка при отправке TON ❌", "error");
     }
   });
 
