@@ -153,10 +153,22 @@
     <label>Сумма</label>
     <input type="number" id="amount" min="0.5" value="10" placeholder="Введите сумму">
 
-    <div id="wallet-address-group" class="hidden">
-      <label>Кошелёк</label>
-      <input type="text" id="wallet-address" readonly>
-    </div>
+<div id="wallet-address-group" class="hidden">
+  <label>Кошелёк</label>
+  <div style="position: relative;">
+    <input type="text" id="wallet-address" readonly style="padding-right: 30px;">
+    <span id="disconnect-btn" style="
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
+      color: #aaa;
+    ">&times;</span>
+  </div>
+</div>
 
     <button class="btn" id="connect-or-send">Подключить</button>
   </div>
@@ -199,17 +211,38 @@
   const button = document.getElementById('connect-or-send');
   const amountInput = document.getElementById('amount');
 
+  // Преобразование адреса в формат base64 (например, UQA8...E0FD)
+  function toUserFriendlyAddress(rawAddress) {
+    try {
+      const { Address } = TON_CONNECT_UI;
+      const addr = Address.parse(rawAddress);
+      return addr.toString({ testOnly: false });
+    } catch (e) {
+      return rawAddress;
+    }
+  }
+
+  // Сокращение UQAx8...R08M
   function shortAddress(addr) {
     return addr.slice(0, 6) + '...' + addr.slice(-6);
+  }
+
+  function resetUI() {
+    connectedWallet = null;
+    addressField.value = '';
+    addressGroup.classList.add('hidden');
+    button.textContent = 'Подключить';
   }
 
   tonConnectUI.onStatusChange(wallet => {
     if (wallet && wallet.account?.address) {
       connectedWallet = wallet;
-      const address = wallet.account.address;
-      addressField.value = shortAddress(address);
+      const userAddress = toUserFriendlyAddress(wallet.account.address);
+      addressField.value = shortAddress(userAddress);
       addressGroup.classList.remove('hidden');
       button.textContent = 'Пополнить';
+    } else {
+      resetUI();
     }
   });
 
@@ -230,7 +263,7 @@
       validUntil: Math.floor(Date.now() / 1000) + 600,
       messages: [
         {
-          address: "UQA3CvDUu1CY........", // ЗАМЕНИ на свой настоящий адрес
+          address: "UQA3CvDUu1CY........", // Заменить на ваш адрес
           amount: nano
         }
       ]
@@ -241,6 +274,12 @@
     } catch (e) {
       alert("Не удалось отправить TON");
     }
+  });
+
+  // Клик по крестику: отключение
+  document.getElementById('disconnect-btn').addEventListener('click', () => {
+    tonConnectUI.disconnect();
+    resetUI();
   });
 </script>
 </body>
