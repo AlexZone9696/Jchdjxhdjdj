@@ -14,7 +14,7 @@
 
     body {
       margin: 0;
-      font-family: sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg-color);
       color: var(--text);
       padding: 20px;
@@ -72,28 +72,46 @@
     .form label {
       display: block;
       margin-bottom: 5px;
+      font-size: 14px;
     }
 
-    .form input {
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .input-group input {
       width: 100%;
-      padding: 10px;
-      border-radius: 10px;
+      padding: 16px;
+      border-radius: 16px;
       border: none;
-      background: var(--card-color);
+      background: #2a2a40;
       color: var(--text);
-      margin-bottom: 15px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .input-group .disconnect-btn {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 20px;
+      color: #999;
     }
 
     .btn {
       background: var(--accent);
       color: var(--text);
       border: none;
-      padding: 14px;
-      border-radius: 14px;
+      padding: 16px;
+      border-radius: 16px;
       width: 100%;
-      font-size: 16px;
+      font-size: 17px;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 5px;
     }
 
     .divider {
@@ -105,7 +123,7 @@
     .manual {
       background: var(--card-color);
       padding: 15px;
-      border-radius: 10px;
+      border-radius: 16px;
     }
 
     .warn {
@@ -115,16 +133,18 @@
     }
 
     .info-box {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
 
     .info-box input {
-      background: var(--card-color);
+      background: #2a2a40;
       border: none;
       width: 100%;
       color: var(--text);
-      padding: 8px;
-      border-radius: 8px;
+      padding: 16px;
+      font-size: 16px;
+      border-radius: 16px;
+      box-sizing: border-box;
     }
 
     .hidden {
@@ -150,25 +170,15 @@
   </div>
 
   <div class="form">
-    <label>Сумма</label>
-    <input type="number" id="amount" min="0.5" value="10" placeholder="Введите сумму">
 
-<div id="wallet-address-group" class="hidden">
-  <label>Кошелёк</label>
-  <div style="position: relative;">
-    <input type="text" id="wallet-address" readonly style="padding-right: 30px;">
-    <span id="disconnect-btn" style="
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 18px;
-      color: #aaa;
-    ">&times;</span>
-  </div>
-</div>
+    <div class="input-group">
+      <input type="number" id="amount" min="0.5" value="10" placeholder="Сумма (TON)">
+    </div>
+
+    <div class="input-group hidden" id="wallet-address-group">
+      <input type="text" id="wallet-address" readonly>
+      <span id="disconnect-btn" class="disconnect-btn">&times;</span>
+    </div>
 
     <button class="btn" id="connect-or-send">Подключить</button>
   </div>
@@ -181,15 +191,12 @@
     <p class="warn">Если вы не укажете memo в комментарии к переводу, средства будут безвозвратно утеряны!</p>
 
     <div class="info-box">
-      <label>Адрес</label>
       <input readonly value="UQA3Cv...DUu1CY">
     </div>
     <div class="info-box">
-      <label>Memo</label>
       <input readonly value="d-zc8jjxk0yjdo7y">
     </div>
     <div class="info-box">
-      <label>Сумма</label>
       <input readonly value="> 0.5 TON">
     </div>
   </div>
@@ -210,8 +217,9 @@
   const addressGroup = document.getElementById('wallet-address-group');
   const button = document.getElementById('connect-or-send');
   const amountInput = document.getElementById('amount');
+  const disconnectBtn = document.getElementById('disconnect-btn');
 
-  // Преобразование адреса в формат base64 (например, UQA8...E0FD)
+  // Преобразование raw-адреса в user-friendly (base64)
   function toUserFriendlyAddress(rawAddress) {
     try {
       const { Address } = TON_CONNECT_UI;
@@ -222,7 +230,6 @@
     }
   }
 
-  // Сокращение UQAx8...R08M
   function shortAddress(addr) {
     return addr.slice(0, 6) + '...' + addr.slice(-6);
   }
@@ -248,17 +255,13 @@
 
   button.addEventListener('click', async () => {
     const amount = parseFloat(amountInput.value);
-
-    if (!connectedWallet) {
-      return tonConnectUI.openModal();
-    }
+    if (!connectedWallet) return tonConnectUI.openModal();
 
     if (isNaN(amount) || amount < 0.5) {
       return alert("Минимальная сумма — 0.5 TON");
     }
 
     const nano = (amount * 1e9).toFixed(0);
-
     const tx = {
       validUntil: Math.floor(Date.now() / 1000) + 600,
       messages: [
@@ -272,12 +275,11 @@
     try {
       await tonConnectUI.sendTransaction(tx);
     } catch (e) {
-      alert("Не удалось отправить TON");
+      alert("Ошибка при отправке TON");
     }
   });
 
-  // Клик по крестику: отключение
-  document.getElementById('disconnect-btn').addEventListener('click', () => {
+  disconnectBtn.addEventListener('click', () => {
     tonConnectUI.disconnect();
     resetUI();
   });
