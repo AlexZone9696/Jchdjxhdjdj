@@ -277,7 +277,7 @@
     const amount = parseFloat(amountInput.value);
     if (!connectedWallet) return tonConnectUI.openModal();
 
-    if (isNaN(amount) || amount < 0.5) {
+    if (isNaN(amount) || amount < 0.0001) {
       return showToast("Минимальная сумма — 0.5 TON", "error");
     }
 
