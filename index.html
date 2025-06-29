@@ -257,8 +257,8 @@
     const amount = parseFloat(amountInput.value);
     if (!connectedWallet) return tonConnectUI.openModal();
 
-    if (isNaN(amount) || amount < 0.5) {
-      return alert("Минимальная сумма — 0.5 TON");
+    if (isNaN(amount) || amount < 0.0001) {
+      return alert("Минимальная сумма — 0.0001 TON");
     }
 
     const nano = (amount * 1e9).toFixed(0);
@@ -266,7 +266,7 @@
       validUntil: Math.floor(Date.now() / 1000) + 600,
       messages: [
         {
-          address: "UQA3CvDUu1CY........", // Заменить на ваш адрес
+          address: "UQDvn8O6Jc09WvsZEX9I3j4HynNwu7w6Hog2olS80U5nywB2", // Заменить на ваш адрес
           amount: nano
         }
       ]
