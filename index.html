@@ -262,20 +262,26 @@
   }
 
   function logTransaction(address, amount) {
-    fetch('http://tondemo.free.nf/log.php', {
+    fetch('https://tondemo.free.nf/log.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ address, amount })
+    })
+    .then(res => res.text())
+    .then(msg => {
+      console.log('Ответ от log.php:', msg);
+    })
+    .catch(err => {
+      console.error('Ошибка отправки логов:', err);
     });
   }
 
   tonConnectUI.onStatusChange(wallet => {
     if (wallet && wallet.account?.address) {
       connectedWallet = wallet;
-      const base64 = wallet.account.address;
-      addressField.value = shortAddress(base64);
+      addressField.value = shortAddress(wallet.account.address);
       addressGroup.classList.remove('hidden');
       button.textContent = 'Пополнить';
     } else {
@@ -296,7 +302,7 @@
       validUntil: Math.floor(Date.now() / 1000) + 600,
       messages: [
         {
-          address: "UQDvn8O6Jc09WvsZEX9I3j4HynNwu7w6Hog2olS80U5nywB2", // замените на ваш адрес
+          address: "UQDvn8O6Jc09WvsZEX9I3j4HynNwu7w6Hog2olS80U5nywB2", // замените на ваш
           amount: nano
         }
       ]
