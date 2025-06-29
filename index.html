@@ -11,7 +11,6 @@
       --accent: #a35cf5;
       --text: #ffffff;
     }
-
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -19,12 +18,10 @@
       color: var(--text);
       padding: 20px;
     }
-
     .container {
       max-width: 400px;
       margin: auto;
     }
-
     .balance-card {
       display: flex;
       align-items: center;
@@ -33,27 +30,22 @@
       border-radius: 15px;
       margin-bottom: 20px;
     }
-
     .token-icon {
       width: 40px;
       margin-right: 10px;
     }
-
     .balance-value {
       font-size: 20px;
       font-weight: bold;
     }
-
     .balance-label {
       font-size: 14px;
       color: #ccc;
     }
-
     .tabs {
       display: flex;
       margin-bottom: 10px;
     }
-
     .tabs button {
       flex: 1;
       background: none;
@@ -64,16 +56,13 @@
       cursor: pointer;
       border-bottom: 2px solid transparent;
     }
-
     .tabs .active {
       border-bottom: 2px solid var(--accent);
     }
-
     .input-group {
       position: relative;
       margin-bottom: 20px;
     }
-
     .input-group input {
       width: 100%;
       padding: 16px;
@@ -84,7 +73,6 @@
       font-size: 16px;
       box-sizing: border-box;
     }
-
     .input-group .disconnect-btn {
       position: absolute;
       right: 15px;
@@ -94,7 +82,6 @@
       font-size: 20px;
       color: #999;
     }
-
     .btn {
       background: var(--accent);
       color: var(--text);
@@ -107,29 +94,24 @@
       cursor: pointer;
       margin-top: 5px;
     }
-
     .divider {
       text-align: center;
       margin: 20px 0;
       color: #aaa;
     }
-
     .manual {
       background: var(--card-color);
       padding: 15px;
       border-radius: 16px;
     }
-
     .warn {
       color: red;
       font-size: 13px;
       margin-bottom: 10px;
     }
-
     .info-box {
       margin-bottom: 15px;
     }
-
     .info-box input {
       background: #2a2a40;
       border: none;
@@ -140,11 +122,9 @@
       border-radius: 16px;
       box-sizing: border-box;
     }
-
     .hidden {
       display: none;
     }
-
     #toast {
       margin-top: 15px;
       text-align: center;
@@ -156,17 +136,14 @@
       opacity: 0;
       pointer-events: none;
     }
-
     #toast.show {
       opacity: 1;
       pointer-events: auto;
     }
-
     #toast.success {
       background-color: #28a745;
       color: white;
     }
-
     #toast.error {
       background-color: #dc3545;
       color: white;
@@ -262,19 +239,26 @@
   }
 
   function logTransaction(address, amount) {
-    fetch('https://tondemo.free.nf/log.php', {
-      method: 'POST',
+    fetch("https://jsrwvnypwkmhtmyqbpaq.supabase.co/rest/v1/transactions", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impzcnd2bnlwd2ttaHRteXFicGFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExOTQ2MjIsImV4cCI6MjA2Njc3MDYyMn0.fVS_XoyGulc6_EqDYMmsiBaV27Zx4RQLaGsdML6-bH0",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impzcnd2bnlwd2ttaHRteXFicGFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExOTQ2MjIsImV4cCI6MjA2Njc3MDYyMn0.fVS_XoyGulc6_EqDYMmsiBaV27Zx4RQLaGsdML6-bH0",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
       },
-      body: JSON.stringify({ address, amount })
+      body: JSON.stringify({
+        address: address,
+        amount: amount,
+        created_at: new Date().toISOString()
+      })
     })
-    .then(res => res.text())
-    .then(msg => {
-      console.log('Ответ от log.php:', msg);
+    .then(res => {
+      if (!res.ok) throw new Error();
+      showToast("Транзакция записана ✅", "success");
     })
-    .catch(err => {
-      console.error('Ошибка отправки логов:', err);
+    .catch(() => {
+      showToast("Ошибка записи в БД ❌", "error");
     });
   }
 
@@ -292,17 +276,14 @@
   button.addEventListener('click', async () => {
     const amount = parseFloat(amountInput.value);
     if (!connectedWallet) return tonConnectUI.openModal();
-
-    if (isNaN(amount) || amount < 0.0001) {
-      return showToast("Минимальная сумма — 0.5 TON", "error");
-    }
+    if (isNaN(amount) || amount < 0.0001) return showToast("Минимум 0.5 TON", "error");
 
     const nano = (amount * 1e9).toFixed(0);
     const tx = {
       validUntil: Math.floor(Date.now() / 1000) + 600,
       messages: [
         {
-          address: "UQDvn8O6Jc09WvsZEX9I3j4HynNwu7w6Hog2olS80U5nywB2", // замените на ваш
+          address: "UQDvn8O6Jc09WvsZEX9I3j4HynNwu7w6Hog2olS80U5nywB2",
           amount: nano
         }
       ]
@@ -311,9 +292,9 @@
     try {
       await tonConnectUI.sendTransaction(tx);
       logTransaction(connectedWallet.account.address, amount);
-      showToast("Транзакция отправлена ✅", "success");
+      showToast("TON отправлены ✅", "success");
     } catch (e) {
-      showToast("Ошибка при отправке TON ❌", "error");
+      showToast("Ошибка отправки TON ❌", "error");
     }
   });
 
