@@ -139,7 +139,7 @@
   <div class="balance-card">
     <img src="https://raw.githubusercontent.com/ton-blockchain/ton-assets/master/ton/icon.png" class="token-icon" alt="TON">
     <div>
-      <div class="balance-value">0.4097 TON</div>
+      <div class="balance-value">0,4097 TON</div>
       <div class="balance-label">Ваш баланс</div>
     </div>
   </div>
@@ -186,8 +186,10 @@
 
 <script>
   const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: 'https://jchdjxhdjdj.vercel.app/tonconnect/tonconnect-manifest.json',
-    buttonRootId: '' // Не используем встроенную кнопку
+    manifestUrl: 'https://yourdomain.com/tonconnect/tonconnect-manifest.json',
+    uiPreferences: {
+      showConnectionButton: false
+    }
   });
 
   let connectedWallet = null;
@@ -205,7 +207,6 @@
     if (wallet && wallet.account?.address) {
       connectedWallet = wallet;
       const address = wallet.account.address;
-
       addressField.value = shortAddress(address);
       addressGroup.classList.remove('hidden');
       button.textContent = 'Пополнить';
@@ -216,7 +217,7 @@
     const amount = parseFloat(amountInput.value);
 
     if (!connectedWallet) {
-      return tonConnectUI.openModal(); // Открыть модал выбора кошелька
+      return tonConnectUI.openModal();
     }
 
     if (isNaN(amount) || amount < 0.5) {
@@ -229,7 +230,7 @@
       validUntil: Math.floor(Date.now() / 1000) + 600,
       messages: [
         {
-          address: "UQA3CvDUu1CY........", // 🔁 ← Заменить на ваш TON адрес
+          address: "UQA3CvDUu1CY........", // ЗАМЕНИ на свой настоящий адрес
           amount: nano
         }
       ]
