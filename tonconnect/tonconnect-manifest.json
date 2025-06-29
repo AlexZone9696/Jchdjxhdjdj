@@ -2,14 +2,14 @@
   "manifest_version": "0.1.0",
   "name": "CloudMine Wallet",
   "description": "TON пополнение через TonConnect",
-  "url": "https://yourdomain.com",
+  "url": "https://jchdjxhdjdj.vercel.app",
   "icons": [
-    "https://yourdomain.com/assets/ton-icon.png"
+    "https://jchdjxhdjdj.vercel.app/assets/ton-icon.png"
   ],
   "bridge": {
     "type": "https",
     "url": "https://bridge.tonapi.io/bridge"
   },
-  "terms_of_use_url": "https://yourdomain.com/terms",
-  "privacy_policy_url": "https://yourdomain.com/privacy"
+  "terms_of_use_url": "https://jchdjxhdjdj.vercel.app/terms",
+  "privacy_policy_url": "https://jchdjxhdjdj.vercel.app/privacy"
 }
