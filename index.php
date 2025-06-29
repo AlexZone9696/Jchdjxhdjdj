@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Пополнение TON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg-color: #12001c;
+      --card-color: #1e1e2f;
+      --accent: #a35cf5;
+      --text: #ffffff;
+    }
+
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: var(--bg-color);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+    }
+
+    .balance-card {
+      display: flex;
+      align-items: center;
+      background: var(--card-color);
+      padding: 15px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+
+    .token-icon {
+      width: 40px;
+      margin-right: 10px;
+    }
+
+    .balance-value {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .balance-label {
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .tabs button {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 10px;
+      color: var(--text);
+      font-size: 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tabs .active {
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .form label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: var(--card-color);
+      color: var(--text);
+      margin-bottom: 15px;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 20px 0;
+      color: #aaa;
+    }
+
+    .manual {
+      background: var(--card-color);
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .warn {
+      color: red;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .info-box {
+      margin-bottom: 10px;
+    }
+
+    .info-box input {
+      background: var(--card-color);
+      border: none;
+      width: 100%;
+      color: var(--text);
+      padding: 8px;
+      border-radius: 8px;
+    }
+  </style>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+  <div class="balance-card">
+    <img src="assets/ton-icon.png" class="token-icon" alt="TON">
+    <div>
+      <div class="balance-value">0.4097 TON</div>
+      <div class="balance-label">Ваш баланс</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active">Пополнение</button>
+    <button class="tab">Вывод</button>
+  </div>
+
+  <div class="form">
+    <label for="amount">Сумма пополнения</label>
+    <input type="number" id="amount" min="0.5" value="10">
+    <div id="ton-connect-button"></div>
+  </div>
+
+  <div class="divider">или</div>
+
+  <div class="manual">
+    <h3>Отправить TON вручную</h3>
+    <p class="warn">Транзакции на сумму менее 0.5 TON не обрабатываются!</p>
+    <p class="warn">Не забудьте указать MEMO — иначе средства будут потеряны!</p>
+
+    <div class="info-box">
+      <label>Адрес</label>
+      <input readonly value="UQC8Z7...x3FhPp">
+    </div>
+    <div class="info-box">
+      <label>Memo</label>
+      <input readonly value="user-abc123">
+    </div>
+    <div class="info-box">
+      <label>Сумма</label>
+      <input readonly value="> 0.5 TON">
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+    manifestUrl: '/tonconnect/tonconnect-manifest.json',
+    buttonRootId: 'ton-connect-button'
+  });
+
+  tonConnectUI.onStatusChange(wallet => {
+    console.log("🟢 Подключен кошелёк:", wallet);
+  });
+</script>
+</body>
+</html>
